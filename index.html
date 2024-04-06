@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+    <body>
+        <canvas id="lienzo"></canvas>
+        <script>
+            var contexto = document.getElementById("lienzo").getContext("2d")
+            document.getElementById("lienzo").width = window.innerWidth
+            document.getElementById("lienzo").height = window.innerHeight
+            var anchura = 10
+            contexto.fillStyle = "grey"
+            var tablero = []
+            for(let x = 0;x<window.innerWidth/anchura;x++){
+                tablero[x] = []
+                for(let y = 0;y<window.innerWidth/anchura;y++){
+                    contexto.beginPath()
+                    contexto.arc(x*anchura,y*anchura,anchura/8,0,Math.PI*2,true)
+                    contexto.fill()
+                    tablero[x][y] = null
+                }
+            }
+            
+            // X inicial
+            contexto.beginPath()
+            contexto.moveTo(Math.round(tablero.length/2)*anchura-anchura/3,Math.round(tablero[0].length/2)*anchura-anchura/3)
+            contexto.lineTo(Math.round(tablero.length/2)*anchura+anchura/3,Math.round(tablero[0].length/2)*anchura+anchura/3)
+            contexto.stroke()
+            contexto.beginPath()
+            contexto.moveTo(Math.round(tablero.length/2)*anchura-anchura/3,Math.round(tablero[0].length/2)*anchura+anchura/3)
+            contexto.lineTo(Math.round(tablero.length/2)*anchura+anchura/3,Math.round(tablero[0].length/2)*anchura-anchura/3)
+            contexto.stroke()
+            tablero[Math.round(tablero.length/2)][Math.round(tablero[0].length/2)] = "X"
+            //console.log(tablero)
+            
+            function O(){
+                var tempx = null
+                var tempy = null
+                let amenaza = false
+                for(let x = 0;x<window.innerWidth/anchura;x++){
+                    for(let y = 0;y<window.innerWidth/anchura;y++){
+                        if(tablero[x][y] == "X"){
+                            //console.log("encontrado")
+                            if(tablero[x-1][y-1] == "X" || tablero[x][y-1] == "X" || tablero[x+1][y-1] == "X" || tablero[x-1][y] == "X" || tablero[x+1][y] == "X" || tablero[x-1][y+1] == "X" || tablero[x][y+1] == "X" || tablero[x+1][y+1] == "X"){
+                                //console.log("amenaza")
+                                amenaza = true
+                                tempx = x
+                                tempy = y
+                                break
+                            }
+                        }
+                    }
+                }
+                if(amenaza == true){
+                    x = tempx
+                    y = tempy
+                    //console.log("amenaza encontrada")
+                    if(tablero[x][y] == "X" && tablero[x-1][y-1] == "X" ){
+                        tablero[x-2][y-2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x][y-1] == "X" ){
+                        tablero[x][y-2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x+1][y-1] == "X" ){
+                        tablero[x+2][y-2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x-1][y] == "X" ){
+                        tablero[x-2][y] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x+1][y] == "X" ){
+                        tablero[x+2][y] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x-1][y+1] == "X" ){
+                        tablero[x-2][y+2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x][y+1] == "X" ){
+                        tablero[x][y+2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "X" && tablero[x+1][y+1] == "X" ){
+                        tablero[x+2][y+2] = "O"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    
+                }else{
+                    //console.log("amenaza no encontrada")
+                    encontrado = false
+                    for(let x = 0;x<window.innerWidth/anchura;x++){
+                        for(let y = 0;y<window.innerWidth/anchura;y++){
+                            if(tablero[x][y] == "X"){
+                                //console.log("vamos")
+                                while(true){
+                                    let nuevax = Math.floor(Math.random()*3)-1
+                                    let nuevay = Math.floor(Math.random()*3)-1
+                                    if(tablero[x+nuevax][x+nuevay] != "X" && tablero[x+nuevax][x+nuevay] != "O"){
+                                        if(nuevax == 0 && nuevay == 0){nuevax++}
+                                        tablero[x+nuevax][x+nuevay] = "O"
+                                        contexto.beginPath()
+                                        contexto.arc((x+nuevax)*anchura,(y+nuevay)*anchura,anchura/3,0,Math.PI*2,true)
+                                        contexto.stroke()
+                                       encontrado = true
+                                        break
+                                    }else{
+                                        
+                                    }
+                                    
+                                }
+                            if(encontrado == true){break}    
+                            }
+                        if(encontrado == true){break}
+                        }
+                    }
+                }
+            }
+            function X(){
+                let amenaza = false
+                for(let x = 0;x<window.innerWidth/anchura;x++){
+                    for(let y = 0;y<window.innerWidth/anchura;y++){
+                        if(tablero[x][y] == "O"){
+                            //console.log("encontrado")
+                            if(tablero[x-1][y-1] == "O" || tablero[x][y-1] == "O" || tablero[x+1][y-1] == "O" || tablero[x-1][y] == "O" || tablero[x+1][y] == "O" || tablero[x-1][y+1] == "O" || tablero[x][y+1] == "O" || tablero[x+1][y+1] == "O"){
+                                //console.log("amenaza")
+                                amenaza = true
+                                 tempx = x
+                                        tempy = y
+                                break
+                            }
+                        }
+                    }
+                }
+                if(amenaza == true){
+                    //console.log("amenaza encontrada")
+                    x = tempx
+                    y = tempy
+                    //console.log("amenaza encontrada")
+                    if(tablero[x][y] == "O" && tablero[x-1][y-1] == "O" ){
+                        tablero[x-2][y-2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x][y-1] == "O" ){
+                        tablero[x][y-2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x+1][y-1] == "O" ){
+                        tablero[x+2][y-2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y-2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x-1][y] == "O" ){
+                        tablero[x-2][y] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x+1][y] == "O" ){
+                        tablero[x+2][y] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x-1][y+1] == "O" ){
+                        tablero[x-2][y+2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x-2)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x][y+1] == "O" ){
+                        tablero[x][y+2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                    if(tablero[x][y] == "O" && tablero[x+1][y+1] == "O" ){
+                        tablero[x+2][y+2] = "X"
+                        contexto.beginPath()
+                        contexto.arc((x+2)*anchura,(y+2)*anchura,anchura/3,0,Math.PI*2,true)
+                        contexto.stroke()   
+                    }
+                }else{
+                    //console.log("amenaza no encontrada")
+                    encontrado = false
+                    for(let x = 0;x<window.innerWidth/anchura;x++){
+                        for(let y = 0;y<window.innerWidth/anchura;y++){
+                            if(tablero[x][y] == "O"){
+                                //console.log("vamos")
+                                while(true){
+                                    let nuevax = Math.floor(Math.random()*3)-1
+                                    let nuevay = Math.floor(Math.random()*3)-1
+                                    if(tablero[x+nuevax][x+nuevay] != "X" && tablero[x+nuevax][x+nuevay] != "O"){
+                                        if(nuevax == 0 && nuevay == 0){nuevax++}
+                                        tablero[x+nuevax][x+nuevay] = "X"
+                                        contexto.beginPath()
+                                        contexto.moveTo((x+nuevax)*anchura-anchura/3,(x+nuevay)*anchura-anchura/3)
+                                        contexto.lineTo((x+nuevax)*anchura+anchura/3,(x+nuevay)*anchura+anchura/3)
+                                        contexto.stroke()
+                                        contexto.beginPath()
+                                        contexto.moveTo((x+nuevax)*anchura-anchura/3,(x+nuevay)*anchura+anchura/3)
+                                        contexto.lineTo((x+nuevax)*anchura+anchura/3,(x+nuevay)*anchura-anchura/3)
+                                        contexto.stroke()
+                                        encontrado = true
+                                        break
+                                    }else{
+                                        
+                                    }
+                                    
+                                } 
+                                if(encontrado == true){break}
+                            }
+                            if(encontrado == true){break}
+                        }
+                    }
+                }
+            }
+            var turno = 0
+            var temporizador = setTimeout("bucle()",1000)
+            function bucle(){
+                if(turno == 0){
+                    console.log("o")
+                    O()
+                    turno++
+                }else{
+                    console.log("x")
+                    X()
+                    turno--
+                }
+                clearTimeout(temporizador)
+                temporizador = setTimeout("bucle()",1000)
+            }
+        </script>
+    </body>
+</html>
